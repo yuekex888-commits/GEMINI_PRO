@@ -19,20 +19,26 @@
             /* 适配 iOS 安全区域 */
             --safe-top: env(safe-area-inset-top, 20px);
             --safe-bottom: env(safe-area-inset-bottom, 20px);
-            --header-height: calc(50px + var(--safe-top)); /* 稍微增加头部高度 */
-            --gemini-blue: #1a73e8; /* Gemini 风格蓝色 */
+            --header-height: calc(50px + var(--safe-top));
+            --gemini-blue: #1a73e8;
             --gemini-bg: #ffffff;
             --gemini-surface: #f8f9fa;
         }
 
         body {
             background-color: var(--gemini-bg);
-            font-family: "Google Sans", Roboto, -apple-system, BlinkMacSystemFont, sans-serif; /* 尝试使用 Google 字体栈 */
+            font-family: "Google Sans", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* 禁止整体滚动，只允许聊天区域滚动 */
+            overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-            color: #202124; /* 深灰文本 */
+            color: #202124;
+            user-select: none; /* 防止长按选中文本干扰操作 */
+        }
+
+        /* 允许消息区域选择文本 */
+        #messages, #user-input {
+            user-select: text; 
         }
 
         /* 侧边栏动画 */
@@ -40,7 +46,7 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding-top: var(--safe-top);
             padding-bottom: var(--safe-bottom);
-            background-color: var(--gemini-surface); /* 更浅的侧边栏背景 */
+            background-color: var(--gemini-surface);
         }
 
         /* 聊天区域 */
@@ -51,7 +57,7 @@
             background-color: var(--gemini-bg);
         }
 
-        /* 顶部导航 - 更干净，去除底部边框 */
+        /* 顶部导航 */
         header {
             height: var(--header-height);
             padding-top: var(--safe-top);
@@ -60,7 +66,6 @@
             justify-content: space-between;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
-            /* border-bottom: 1px solid #e5e7eb;  移除边框让视野更开阔 */
             z-index: 50;
             position: absolute;
             top: 0;
@@ -74,33 +79,32 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding-top: var(--header-height);
-            padding-bottom: calc(90px + var(--safe-bottom)); /* 留出更多底部空间给悬浮输入框 */
+            padding-bottom: calc(90px + var(--safe-bottom));
             scroll-behavior: smooth;
             padding-left: 1rem;
             padding-right: 1rem;
         }
 
-        /* 底部输入框 - 悬浮胶囊风格 */
+        /* 底部输入框 */
         #input-area {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: transparent; /* 背景透明 */
-            /* border-top: 1px solid #e5e7eb; 移除顶部边框 */
+            background: transparent;
             padding: 10px 16px;
             padding-bottom: max(10px, var(--safe-bottom));
             z-index: 50;
-            pointer-events: none; /* 让点击穿透到下方的输入胶囊 */
+            pointer-events: none;
         }
 
         /* 输入胶囊容器 */
         .input-capsule {
             background: var(--gemini-surface);
             border-radius: 2rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05); /* 柔和阴影 */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05);
             padding: 8px;
-            pointer-events: auto; /* 恢复交互 */
+            pointer-events: auto;
             border: 1px solid #e5e7eb;
             transition: box-shadow 0.2s, border-color 0.2s;
         }
@@ -109,11 +113,10 @@
              box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
         }
 
-
-        /* 消息气泡重构 */
+        /* 消息气泡 */
         .message-container {
             display: flex;
-            margin-bottom: 1.5rem; /* 增加消息间距 */
+            margin-bottom: 1.5rem;
             animation: fadeIn 0.3s ease;
         }
 
@@ -121,23 +124,21 @@
             margin-left: auto;
             background-color: var(--gemini-blue);
             color: white;
-            border-radius: 1.25rem 1.25rem 0.25rem 1.25rem; /* 更圆润，右下角尖角 */
+            border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
             padding: 12px 18px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             max-width: 85%;
         }
 
-        /* Assistant 消息 - 无气泡风格 */
         .message.assistant {
             margin-right: auto;
-            background-color: transparent; /* 透明背景 */
+            background-color: transparent;
             color: #202124;
-            padding: 0; /* 移除内边距 */
+            padding: 0;
             max-width: 100%;
             width: 100%;
         }
         
-        /* Gemini 图标容器 */
         .assistant-icon {
             width: 28px;
             height: 28px;
@@ -147,7 +148,7 @@
             align-items: center;
             justify-content: center;
         }
-        /* 简单的闪烁图标模拟 Gemini */
+        
         .sparkle-icon {
             color: var(--gemini-blue);
             font-size: 1.2rem;
@@ -155,16 +156,13 @@
 
         .message img {
             max-width: 100%;
-            border-radius: 12px; /* 更圆的图片角 */
+            border-radius: 12px;
             margin-top: 8px;
             border: 1px solid #f1f3f4;
         }
         
-        /* Markdown 样式优化 */
-        .prose {
-            font-size: 1rem;
-            line-height: 1.6;
-        }
+        /* Markdown 样式 */
+        .prose { font-size: 1rem; line-height: 1.6; }
         .prose p { margin-bottom: 1em; }
         .prose p:last-child { margin-bottom: 0; }
         .prose pre { background: #f1f3f4; color: #202124; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 1em 0; border: 1px solid #e0e0e0;}
@@ -178,36 +176,66 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 录音动画 - 更柔和 */
-        .recording-pulse {
-            animation: pulse-blue 1.5s infinite;
-            background-color: #e8f0fe !important; /* 浅蓝色背景 */
-            color: var(--gemini-blue) !important;
+        /* 录音浮层 (WeChat Style) */
+        #recording-overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            z-index: 100;
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
         }
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+        #recording-overlay.active {
+            opacity: 1;
+        }
+        .recording-wave {
+            display: flex;
+            gap: 4px;
+            height: 30px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .recording-wave div {
+            width: 4px;
+            background: #fff;
+            animation: wave 0.5s infinite ease-in-out;
+            border-radius: 2px;
+        }
+        .recording-wave div:nth-child(2) { animation-delay: 0.1s; }
+        .recording-wave div:nth-child(3) { animation-delay: 0.2s; }
+        .recording-wave div:nth-child(4) { animation-delay: 0.3s; }
+        .recording-wave div:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { height: 10px; }
+            50% { height: 30px; }
         }
 
-        /* 自定义滚动条 */
-        #messages::-webkit-scrollbar { width: 6px; }
-        #messages::-webkit-scrollbar-track { background: transparent; }
-        #messages::-webkit-scrollbar-thumb { background-color: #dadce0; border-radius: 3px; }
+        /* 按钮按下效果 */
+        #voice-btn:active {
+            background-color: #e5e7eb;
+            color: var(--gemini-blue);
+            transform: scale(0.95);
+        }
 
         /* 设置弹窗动画 */
         .modal-enter { opacity: 0; transform: scale(0.95); }
         .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.2s, transform 0.2s; }
-        .modal-exit { opacity: 1; transform: scale(1); }
-        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; }
 
         /* 思考过程折叠样式 */
-        details > summary {
-            list-style: none;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body>
@@ -215,24 +243,28 @@
     <!-- 侧边栏遮罩 -->
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
 
+    <!-- 录音状态浮层 (微信风格) -->
+    <div id="recording-overlay">
+        <div class="recording-wave">
+            <div></div><div></div><div></div><div></div><div></div>
+        </div>
+        <p class="text-sm font-medium">正在说话...</p>
+    </div>
+
     <!-- 侧边栏 (历史记录) -->
     <div id="sidebar" class="sidebar fixed top-0 left-0 w-72 h-full border-r border-gray-100 z-50 transform -translate-x-full flex flex-col shadow-xl">
         <div class="p-4 flex justify-between items-center bg-transparent shrink-0">
-            <h2 class="font-bold text-xl text-gray-800" style="font-family: 'Google Sans', sans-serif;">历史记录</h2>
-            <!-- 新建对话按钮 -->
-            <button onclick="createNewChat()" class="py-2 px-4 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 flex items-center font-medium transition-colors">
-                <i class="fas fa-plus text-sm mr-2"></i> 新对话
-            </button>
+            <h2 class="font-bold text-xl text-gray-800" style="font-family: 'Google Sans', sans-serif;">AI Chat Pro</h2>
         </div>
         
         <!-- 列表区域 -->
         <div id="chat-list" class="flex-1 overflow-y-auto p-3 space-y-2">
-            <!-- 对话列表由 JS 生成 -->
+            <!-- 列表由 JS 生成，首项将是新建对话 -->
         </div>
 
-        <!-- 底部设置按钮区域 (侧边栏) -->
+        <!-- 底部设置按钮区域 -->
         <div class="p-4 border-t border-gray-100 bg-gray-50 shrink-0">
-            <button onclick="openSettings()" class="w-full flex items-center justify-center py-2 px-4 text-gray-600 hover:text-blue-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-gray-200 hover:shadow-sm">
+            <button onclick="openSettings()" class="w-full flex items-center justify-center py-3 px-4 text-gray-600 hover:text-blue-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-gray-200 hover:shadow-sm text-sm font-medium">
                 <i class="fas fa-cog mr-2"></i> 设置 API & 模型
             </button>
         </div>
@@ -240,13 +272,11 @@
 
     <!-- 设置弹窗 Modal -->
     <div id="settings-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
-        <!-- 背景遮罩 -->
         <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeSettings()"></div>
-        <!-- 弹窗内容 -->
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-100 opacity-100">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">设置</h3>
-                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-gray-600 p-2">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -254,24 +284,24 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">API Base URL</label>
-                    <input type="text" id="setting-url" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" placeholder="https://api.example.com/v1/chat/completions">
+                    <input type="text" id="setting-url" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50" placeholder="https://api.grsai.com/v1/chat/completions">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-                    <input type="password" id="setting-key" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" placeholder="sk-...">
+                    <input type="password" id="setting-key" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50" placeholder="sk-...">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">模型名称 (Model)</label>
-                    <input type="text" id="setting-model" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" placeholder="gemini-3-pro">
+                    <input type="text" id="setting-model" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50" placeholder="gemini-3-pro">
                 </div>
             </div>
 
             <div class="flex gap-3 mt-8">
-                <button onclick="resetSettings()" class="flex-1 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors">
+                <button onclick="resetSettings()" class="flex-1 px-4 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors">
                     恢复默认
                 </button>
-                <button onclick="saveSettings()" class="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                    保存设置
+                <button onclick="saveSettings()" class="flex-1 px-4 py-3 text-white bg-blue-600 hover:bg-blue-700 rounded-xl text-sm font-medium transition-colors shadow-sm">
+                    保存
                 </button>
             </div>
         </div>
@@ -281,49 +311,46 @@
     <div id="chat-container" class="relative w-full">
         <!-- 顶部 -->
         <header class="px-5">
-            <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            <button onclick="toggleSidebar()" class="p-3 -ml-3 text-gray-600 hover:bg-gray-100 rounded-full transition-colors active:scale-95">
                 <i class="fas fa-bars text-xl"></i>
             </button>
             
-            <!-- 标题现在可以点击重命名 -->
-            <div class="flex-1 mx-2 overflow-hidden flex justify-center cursor-pointer hover:bg-gray-50 py-1 rounded-lg transition-colors group" onclick="renameCurrentChat()" title="点击重命名">
+            <!-- 标题 (点击重命名) -->
+            <div class="flex-1 mx-2 overflow-hidden flex justify-center cursor-pointer hover:bg-gray-50 py-2 rounded-lg transition-colors group" onclick="renameCurrentChat()" title="点击重命名">
                  <h1 class="font-medium text-lg truncate text-gray-700 max-w-[200px]" id="current-chat-title">新对话</h1>
-                 <i class="fas fa-pen text-xs text-gray-400 ml-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                 <i class="fas fa-pen text-xs text-gray-400 ml-2 mt-1.5 opacity-0 group-hover:opacity-100"></i>
             </div>
             
-            <!-- 右侧按钮组：设置 -->
-            <div class="flex items-center gap-1 -mr-2">
-                <button onclick="openSettings()" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="设置">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
+            <!-- 设置按钮 -->
+            <button onclick="openSettings()" class="p-3 -mr-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors active:scale-95">
+                <i class="fas fa-cog"></i>
+            </button>
         </header>
 
         <!-- 消息流 -->
         <div id="messages" class="px-4 relative">
-            <!-- 欢迎消息 - Gemini 风格 -->
             <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 transition-opacity duration-300" id="empty-state">
                  <div class="w-20 h-20 bg-gradient-to-tr from-blue-100 to-purple-100 rounded-3xl flex items-center justify-center mb-6 shadow-sm">
                     <i class="fas fa-sparkles text-4xl text-blue-500 opacity-80"></i>
                 </div>
                 <h2 class="text-2xl font-semibold text-gray-700 mb-3">你好，我是 AI 助手</h2>
-                <p class="text-gray-500 text-center max-w-sm">我可以帮你写文章、做规划、或者只是聊聊天。请在下方输入开始吧。</p>
+                <p class="text-gray-500 text-center max-w-sm">发图片、发语音，开始对话吧。</p>
             </div>
         </div>
 
-        <!-- 底部输入栏 - 悬浮胶囊 -->
+        <!-- 底部输入栏 -->
         <div id="input-area">
             <!-- 图片预览区域 -->
             <div id="image-preview-container" class="hidden mb-3 relative inline-block ml-4">
                 <img id="image-preview" src="" class="h-20 w-20 object-cover rounded-xl border border-gray-200 shadow-sm">
-                <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-gray-900">
+                <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-gray-900 active:scale-90 transition-transform">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <div class="input-capsule flex items-end gap-1 mx-2 sm:mx-auto sm:max-w-3xl bg-white">
                 <!-- 图片上传按钮 -->
-                <button onclick="document.getElementById('image-upload').click()" class="p-3 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors shrink-0">
+                <button onclick="document.getElementById('image-upload').click()" class="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0 active:scale-95">
                     <i class="far fa-image text-xl"></i>
                 </button>
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(this)">
@@ -331,14 +358,21 @@
                 <!-- 文本输入 -->
                 <textarea id="user-input" rows="1" class="flex-1 bg-transparent border-0 focus:ring-0 px-2 py-3 text-base resize-none max-h-32 text-gray-700 placeholder-gray-400" placeholder="输入消息..." oninput="autoResize(this)"></textarea>
 
-                <!-- 语音按钮 -->
-                <button id="voice-btn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()" class="p-3 text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors shrink-0 rounded-full">
+                <!-- 语音按钮 (微信式按住说话) -->
+                <!-- 使用 touchstart/touchend 适配手机，mousedown/mouseup 适配电脑 -->
+                <button id="voice-btn" 
+                    ontouchstart="handleVoiceStart(event)" 
+                    ontouchend="handleVoiceEnd(event)" 
+                    onmousedown="handleVoiceStart(event)" 
+                    onmouseup="handleVoiceEnd(event)" 
+                    class="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors shrink-0 rounded-full select-none -webkit-user-select-none">
                     <i class="fas fa-microphone text-xl"></i>
                 </button>
 
-                <!-- 发送按钮 (输入内容时变色) -->
-                <button id="send-btn" onclick="sendMessage()" class="p-3 text-gray-300 rounded-full transition-colors shrink-0 cursor-not-allowed" disabled>
-                    <i class="fas fa-paper-plane text-xl"></i>
+                <!-- 发送按钮 -->
+                <button id="send-btn" onclick="sendMessage()" class="p-3 text-gray-300 rounded-full transition-all shrink-0 cursor-not-allowed flex items-center justify-center w-12 h-12" disabled>
+                    <i class="fas fa-paper-plane text-xl" id="send-icon"></i>
+                    <i class="fas fa-spinner fa-spin text-xl hidden" id="loading-icon"></i>
                 </button>
             </div>
         </div>
@@ -357,6 +391,7 @@
         let currentChatId = localStorage.getItem('current_chat_id');
         let currentImageBase64 = null;
         let recognition = null;
+        let isRecording = false;
 
         // 获取当前 API 配置
         function getApiConfig() {
@@ -375,17 +410,13 @@
         loadCurrentChat();
         updateSendButtonState();
 
-        // --- 设置相关逻辑 ---
-
+        // --- 设置逻辑 ---
         function openSettings() {
             const config = getApiConfig();
             document.getElementById('setting-url').value = config.baseUrl;
             document.getElementById('setting-key').value = config.apiKey;
             document.getElementById('setting-model').value = config.model;
-            
-            const modal = document.getElementById('settings-modal');
-            modal.classList.remove('hidden');
-            // 关闭侧边栏
+            document.getElementById('settings-modal').classList.remove('hidden');
             toggleSidebar(false);
         }
 
@@ -399,13 +430,10 @@
                 apiKey: document.getElementById('setting-key').value.trim(),
                 model: document.getElementById('setting-model').value.trim()
             };
-
-            // 简单验证
             if(!newConfig.baseUrl || !newConfig.apiKey || !newConfig.model) {
                 alert("所有字段都不能为空");
                 return;
             }
-
             localStorage.setItem('ai_api_config', JSON.stringify(newConfig));
             closeSettings();
             alert("设置已保存！");
@@ -419,7 +447,7 @@
             }
         }
 
-        // --- 聊天重命名逻辑 ---
+        // --- 聊天列表管理 ---
 
         function renameCurrentChat() {
             const chat = getCurrentChat();
@@ -428,9 +456,7 @@
         }
 
         function renameChat(id, currentTitle) {
-            // 阻止事件冒泡 (如果是在侧边栏点击的)
             if(window.event) window.event.stopPropagation();
-
             const newTitle = prompt("重命名对话:", currentTitle);
             if (newTitle && newTitle.trim() !== "") {
                 const chat = conversations.find(c => c.id === id);
@@ -438,7 +464,6 @@
                     chat.title = newTitle.trim();
                     saveData();
                     loadChatList();
-                    // 如果改的是当前对话，同时更新标题栏
                     if (id === currentChatId) {
                         document.getElementById('current-chat-title').innerText = chat.title;
                     }
@@ -446,22 +471,15 @@
             }
         }
         
-        // --- 侧边栏删除逻辑 ---
         function deleteChat(id, event) {
             if(event) event.stopPropagation();
-            
-            if(confirm('确定要删除这个对话吗？此操作无法撤销。')) {
-                // 如果删除的是当前对话
+            if(confirm('确定要删除这个对话吗？')) {
                 const isCurrent = id === currentChatId;
-                
                 conversations = conversations.filter(c => c.id !== id);
-                
                 if (conversations.length === 0) {
-                    createNewChat(); // 如果删完了，创建新的
+                    createNewChat();
                 } else {
-                    if (isCurrent) {
-                        currentChatId = conversations[0].id; // 切换到第一个
-                    }
+                    if (isCurrent) currentChatId = conversations[0].id;
                     saveData();
                     loadChatList();
                     if (isCurrent) loadCurrentChat();
@@ -469,17 +487,18 @@
             }
         }
 
-        // --- 语音识别 (Web Speech API) ---
+        // --- 语音识别 (WeChat Style) ---
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
             recognition.lang = 'zh-CN';
-            recognition.continuous = false;
+            recognition.continuous = false; 
             recognition.interimResults = false;
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 const input = document.getElementById('user-input');
+                // 追加文本
                 input.value += (input.value ? ' ' : '') + transcript;
                 autoResize(input);
                 updateSendButtonState();
@@ -487,31 +506,38 @@
 
             recognition.onerror = (event) => {
                 console.error('语音识别错误:', event.error);
-                document.getElementById('voice-btn').classList.remove('recording-pulse');
+                document.getElementById('recording-overlay').classList.remove('active');
             };
 
             recognition.onend = () => {
-                document.getElementById('voice-btn').classList.remove('recording-pulse');
+                document.getElementById('recording-overlay').classList.remove('active');
+                isRecording = false;
             };
         } else {
             document.getElementById('voice-btn').style.display = 'none';
         }
 
-        function startRecording() {
-            if (recognition) {
+        function handleVoiceStart(e) {
+            e.preventDefault(); // 防止触发其他点击事件或滚动
+            if (recognition && !isRecording) {
                 try {
                     recognition.start();
-                    document.getElementById('voice-btn').classList.add('recording-pulse');
+                    isRecording = true;
+                    document.getElementById('recording-overlay').classList.add('active');
                     if (navigator.vibrate) navigator.vibrate(50);
                 } catch (e) { console.error(e); }
             }
         }
 
-        function stopRecording() {
-            if (recognition) { recognition.stop(); }
+        function handleVoiceEnd(e) {
+            e.preventDefault();
+            if (recognition && isRecording) {
+                recognition.stop();
+                // Overlay 的移除由 onend 处理
+            }
         }
 
-        // --- 聊天逻辑 ---
+        // --- 聊天核心逻辑 ---
 
         function createNewChat(refresh = true) {
             const newChat = {
@@ -537,11 +563,6 @@
             toggleSidebar(false);
         }
 
-        // 保留此函数用于顶部按钮，内部调用 deleteChat
-        function deleteCurrentChat() {
-            deleteChat(currentChatId);
-        }
-
         function saveData() {
             localStorage.setItem('ai_conversations', JSON.stringify(conversations));
             localStorage.setItem('current_chat_id', currentChatId);
@@ -551,26 +572,34 @@
             return conversations.find(c => c.id === currentChatId);
         }
 
-        // 更新侧边栏列表样式 (新增删除按钮)
+        // 侧边栏渲染：新对话按钮在第一位
         function loadChatList() {
             const list = document.getElementById('chat-list');
             list.innerHTML = '';
+            
+            // 1. 添加“新建对话”按钮作为列表第一项
+            const newChatBtn = document.createElement('button');
+            newChatBtn.onclick = () => createNewChat();
+            newChatBtn.className = "w-full mb-3 p-3 rounded-2xl bg-blue-50 text-blue-600 font-medium flex items-center justify-center hover:bg-blue-100 transition-colors";
+            newChatBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> 新建对话';
+            list.appendChild(newChatBtn);
+
+            // 2. 渲染历史列表
             conversations.forEach(chat => {
                 const div = document.createElement('div');
                 const isActive = chat.id === currentChatId;
-                // Gemini 风格：选中项使用浅蓝色背景和蓝色文本，圆角
-                div.className = `p-3 rounded-2xl cursor-pointer flex items-center justify-between group transition-all ${isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium' : 'hover:bg-gray-100 text-gray-700'}`;
+                div.className = `p-3 rounded-2xl cursor-pointer flex items-center justify-between group transition-all mb-1 ${isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium' : 'hover:bg-gray-100 text-gray-700'}`;
                 
                 div.innerHTML = `
-                    <div class="flex items-center flex-1 overflow-hidden" onclick="switchChat('${chat.id}')">
+                    <div class="flex items-center flex-1 overflow-hidden h-full py-1" onclick="switchChat('${chat.id}')">
                         <i class="far fa-comment-alt mr-3 opacity-70 ${isActive ? 'text-blue-500' : ''} shrink-0"></i>
                         <span class="truncate text-sm w-full">${escapeHtml(chat.title)}</span>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 active:opacity-100">
-                        <button onclick="renameChat('${chat.id}', '${escapeHtml(chat.title)}')" class="p-1.5 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors" title="重命名">
+                    <div class="flex items-center gap-1 ${isActive ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100 transition-opacity">
+                        <button onclick="renameChat('${chat.id}', '${escapeHtml(chat.title)}')" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 rounded-full hover:bg-white transition-colors">
                             <i class="fas fa-pen text-xs"></i>
                         </button>
-                         <button onclick="deleteChat('${chat.id}', event)" class="p-1.5 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors" title="删除">
+                         <button onclick="deleteChat('${chat.id}', event)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 rounded-full hover:bg-white transition-colors">
                             <i class="far fa-trash-alt text-xs"></i>
                         </button>
                     </div>
@@ -585,12 +614,13 @@
 
             document.getElementById('current-chat-title').innerText = chat.title;
             const messagesDiv = document.getElementById('messages');
-            // 清空消息，保留 empty-state
-            Array.from(messagesDiv.children).forEach(child => {
-                if (child.id !== 'empty-state') messagesDiv.removeChild(child);
-            });
-
+            
+            // 保留 empty-state 元素
             const emptyState = document.getElementById('empty-state');
+            while(messagesDiv.lastElementChild && messagesDiv.lastElementChild.id !== 'empty-state') {
+                messagesDiv.removeChild(messagesDiv.lastElementChild);
+            }
+
             if (chat.messages.length === 0) {
                 emptyState.classList.remove('opacity-0', 'pointer-events-none');
             } else {
@@ -601,38 +631,21 @@
             updateSendButtonState();
         }
 
-        // --- 新增：格式化消息内容，处理 <think> 标签 ---
+        // 解析 <think> 标签和 Markdown
         function formatMessageContent(content) {
-            // 正则匹配 <think>...</think> 块
-            // [\s\S]*? 表示匹配任意字符包括换行符，非贪婪模式
             const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+            if (!thinkRegex.test(content)) return marked.parse(content);
             
-            // 如果没有 think 标签，直接返回 Markdown 渲染结果
-            if (!thinkRegex.test(content)) {
-                return marked.parse(content);
-            }
-            
-            // 重置正则索引
             thinkRegex.lastIndex = 0;
-            
             let formattedHtml = '';
             let lastIndex = 0;
             let match;
             
-            // 循环处理所有匹配到的 think 块 (虽然通常只有一个)
             while ((match = thinkRegex.exec(content)) !== null) {
-                // 添加 think 块之前的普通文本
                 const before = content.substring(lastIndex, match.index);
-                if (before.trim()) {
-                    formattedHtml += marked.parse(before);
-                }
+                if (before.trim()) formattedHtml += marked.parse(before);
                 
-                // 处理 think 块内容
-                const thinkContent = match[1];
-                // 递归渲染内部 markdown (如果需要) 或仅处理换行
-                const thinkHtml = marked.parse(thinkContent);
-                
-                // 构建 Gemini 风格的折叠卡片
+                const thinkHtml = marked.parse(match[1]);
                 formattedHtml += `
                     <details class="group mb-4 rounded-xl bg-[#f0f4f9] border-none overflow-hidden">
                         <summary class="flex items-center gap-2 px-4 py-3 cursor-pointer select-none text-sm font-medium text-gray-600 hover:bg-[#e9eef6] transition-colors">
@@ -645,35 +658,28 @@
                         </div>
                     </details>
                 `;
-                
                 lastIndex = thinkRegex.lastIndex;
             }
             
-            // 添加最后一个 think 块之后的文本
             const after = content.substring(lastIndex);
-            if (after.trim()) {
-                formattedHtml += marked.parse(after);
-            }
+            if (after.trim()) formattedHtml += marked.parse(after);
             
             return formattedHtml;
         }
 
-        // 更新消息渲染样式
         function renderMessage(msg) {
             const messagesDiv = document.getElementById('messages');
             const container = document.createElement('div');
-            // 区分用户和 AI 的容器样式
             container.className = `message-container w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
             
             if (msg.role === 'user') {
                 container.innerHTML = `
                     <div class="message user text-[15px] leading-relaxed shadow-sm">
-                        ${msg.image ? `<img src="${msg.image}" class="max-h-60 block mb-3">` : ''}
-                        <div class="whitespace-pre-wrap">${escapeHtml(msg.content)}</div>
+                        ${msg.image ? `<img src="${msg.image}" class="max-h-60 block mb-3 rounded-lg border border-white/20">` : ''}
+                        ${msg.content ? `<div class="whitespace-pre-wrap">${escapeHtml(msg.content)}</div>` : ''}
                     </div>
                 `;
             } else {
-                // Assistant 消息：使用新的 formatMessageContent 处理 <think> 标签
                 container.innerHTML = `
                     <div class="assistant-icon pt-1">
                          <i class="fas fa-sparkles sparkle-icon"></i>
@@ -689,22 +695,29 @@
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const sendIcon = document.getElementById('send-icon');
+            const loadingIcon = document.getElementById('loading-icon');
+
             const text = input.value.trim();
             const image = currentImageBase64;
-            const sendBtn = document.getElementById('send-btn');
 
             if ((!text && !image) || sendBtn.disabled) return;
 
-            // 获取最新配置
-            const config = getApiConfig();
+            // 1. 设置发送中状态 (防止重复点击，显示 Loading)
+            sendBtn.disabled = true;
+            sendIcon.classList.add('hidden');
+            loadingIcon.classList.remove('hidden');
 
+            const config = getApiConfig();
             const chat = getCurrentChat();
             const userMsg = { role: 'user', content: text, image: image };
 
+            // 2. 更新 UI
             chat.messages.push(userMsg);
             
             if (chat.messages.length === 1) {
-                chat.title = text.substring(0, 20) || '新对话';
+                chat.title = text.substring(0, 15) || '图片对话';
                 loadChatList();
                 document.getElementById('current-chat-title').innerText = chat.title;
             }
@@ -712,18 +725,21 @@
             saveData();
             renderMessage(userMsg);
             
+            // 3. 清空输入
             input.value = '';
             input.style.height = 'auto';
-            clearImage();
+            clearImage(); // 关键：发送后立刻清除图片缓存
             scrollToBottom();
-            updateSendButtonState();
+            // 保持按钮 Loading 状态直到 API 返回
 
+            // 4. 构建 Payload
             const apiMessages = chat.messages.map(m => {
                 if (m.role === 'user') {
                     if (m.image) {
                         return {
                             role: 'user',
                             content: [
+                                // OpenAI 兼容接口通常要求 text 字段不能为空，给一个默认提示
                                 { type: "text", text: m.content || "Analyze this image" },
                                 { type: "image_url", image_url: { url: m.image } }
                             ]
@@ -736,7 +752,7 @@
                 }
             });
 
-            // Loading 状态
+            // 5. 显示 AI 思考中占位符
             const loadingId = 'loading-' + Date.now();
             const loadingContainer = document.createElement('div');
             loadingContainer.id = loadingId;
@@ -776,9 +792,14 @@
                 scrollToBottom();
 
             } catch (error) {
-                document.getElementById(loadingId).remove();
-                renderMessage({ role: 'assistant', content: `**出错了**：${error.message} \n\n请检查 API 设置是否正确。` });
+                document.getElementById(loadingId)?.remove();
+                renderMessage({ role: 'assistant', content: `**出错了**：${error.message} \n\n请检查网络或 API 设置。如果是发送图片，可能是图片太大超过了模型限制。` });
                 scrollToBottom();
+            } finally {
+                // 6. 恢复发送按钮状态
+                sendIcon.classList.remove('hidden');
+                loadingIcon.classList.add('hidden');
+                updateSendButtonState();
             }
         }
 
@@ -825,13 +846,17 @@
             const hasImage = currentImageBase64 !== null;
             const sendBtn = document.getElementById('send-btn');
             
+            // 如果正在 loading (按钮被 disable 且 loading icon 显示)，则不应该在这里被重置
+            const isLoading = !document.getElementById('loading-icon').classList.contains('hidden');
+            if (isLoading) return;
+
             if (hasText || hasImage) {
                 sendBtn.classList.remove('text-gray-300', 'cursor-not-allowed');
-                sendBtn.classList.add('text-blue-500', 'hover:bg-blue-50', 'active:scale-95');
+                sendBtn.classList.add('text-blue-600', 'bg-blue-50', 'active:scale-95');
                 sendBtn.disabled = false;
             } else {
                 sendBtn.classList.add('text-gray-300', 'cursor-not-allowed');
-                sendBtn.classList.remove('text-blue-500', 'hover:bg-blue-50', 'active:scale-95');
+                sendBtn.classList.remove('text-blue-600', 'bg-blue-50', 'active:scale-95');
                 sendBtn.disabled = true;
             }
         }
