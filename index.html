@@ -200,6 +200,14 @@
         .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.2s, transform 0.2s; }
         .modal-exit { opacity: 1; transform: scale(1); }
         .modal-exit-active { opacity: 0; transform: scale(0.95); transition: opacity 0.2s, transform 0.2s; }
+
+        /* 思考过程折叠样式 */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -222,7 +230,7 @@
             <!-- 对话列表由 JS 生成 -->
         </div>
 
-        <!-- 底部设置按钮区域 -->
+        <!-- 底部设置按钮区域 (侧边栏) -->
         <div class="p-4 border-t border-gray-100 bg-gray-50 shrink-0">
             <button onclick="openSettings()" class="w-full flex items-center justify-center py-2 px-4 text-gray-600 hover:text-blue-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-gray-200 hover:shadow-sm">
                 <i class="fas fa-cog mr-2"></i> 设置 API & 模型
@@ -276,15 +284,19 @@
             <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
                 <i class="fas fa-bars text-xl"></i>
             </button>
+            
             <!-- 标题现在可以点击重命名 -->
             <div class="flex-1 mx-2 overflow-hidden flex justify-center cursor-pointer hover:bg-gray-50 py-1 rounded-lg transition-colors group" onclick="renameCurrentChat()" title="点击重命名">
                  <h1 class="font-medium text-lg truncate text-gray-700 max-w-[200px]" id="current-chat-title">新对话</h1>
                  <i class="fas fa-pen text-xs text-gray-400 ml-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity"></i>
             </div>
             
-            <button onclick="deleteCurrentChat()" class="p-2 -mr-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
-                <i class="far fa-trash-alt"></i>
-            </button>
+            <!-- 右侧按钮组：设置 -->
+            <div class="flex items-center gap-1 -mr-2">
+                <button onclick="openSettings()" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="设置">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
         </header>
 
         <!-- 消息流 -->
@@ -417,7 +429,7 @@
 
         function renameChat(id, currentTitle) {
             // 阻止事件冒泡 (如果是在侧边栏点击的)
-            if(event) event.stopPropagation();
+            if(window.event) window.event.stopPropagation();
 
             const newTitle = prompt("重命名对话:", currentTitle);
             if (newTitle && newTitle.trim() !== "") {
@@ -430,6 +442,29 @@
                     if (id === currentChatId) {
                         document.getElementById('current-chat-title').innerText = chat.title;
                     }
+                }
+            }
+        }
+        
+        // --- 侧边栏删除逻辑 ---
+        function deleteChat(id, event) {
+            if(event) event.stopPropagation();
+            
+            if(confirm('确定要删除这个对话吗？此操作无法撤销。')) {
+                // 如果删除的是当前对话
+                const isCurrent = id === currentChatId;
+                
+                conversations = conversations.filter(c => c.id !== id);
+                
+                if (conversations.length === 0) {
+                    createNewChat(); // 如果删完了，创建新的
+                } else {
+                    if (isCurrent) {
+                        currentChatId = conversations[0].id; // 切换到第一个
+                    }
+                    saveData();
+                    loadChatList();
+                    if (isCurrent) loadCurrentChat();
                 }
             }
         }
@@ -502,18 +537,9 @@
             toggleSidebar(false);
         }
 
+        // 保留此函数用于顶部按钮，内部调用 deleteChat
         function deleteCurrentChat() {
-            if(confirm('确定要删除当前对话吗？')) {
-                conversations = conversations.filter(c => c.id !== currentChatId);
-                if (conversations.length === 0) {
-                    createNewChat();
-                } else {
-                    currentChatId = conversations[0].id;
-                    saveData();
-                    loadChatList();
-                    loadCurrentChat();
-                }
-            }
+            deleteChat(currentChatId);
         }
 
         function saveData() {
@@ -525,7 +551,7 @@
             return conversations.find(c => c.id === currentChatId);
         }
 
-        // 更新侧边栏列表样式
+        // 更新侧边栏列表样式 (新增删除按钮)
         function loadChatList() {
             const list = document.getElementById('chat-list');
             list.innerHTML = '';
@@ -535,15 +561,19 @@
                 // Gemini 风格：选中项使用浅蓝色背景和蓝色文本，圆角
                 div.className = `p-3 rounded-2xl cursor-pointer flex items-center justify-between group transition-all ${isActive ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium' : 'hover:bg-gray-100 text-gray-700'}`;
                 
-                // 只有悬停时或激活时才显示重命名图标，移动端可以一直显示或用空间换
                 div.innerHTML = `
                     <div class="flex items-center flex-1 overflow-hidden" onclick="switchChat('${chat.id}')">
                         <i class="far fa-comment-alt mr-3 opacity-70 ${isActive ? 'text-blue-500' : ''} shrink-0"></i>
                         <span class="truncate text-sm w-full">${escapeHtml(chat.title)}</span>
                     </div>
-                    <button onclick="renameChat('${chat.id}', '${escapeHtml(chat.title)}')" class="p-2 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 active:opacity-100">
-                        <i class="fas fa-pen text-xs"></i>
-                    </button>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100 active:opacity-100">
+                        <button onclick="renameChat('${chat.id}', '${escapeHtml(chat.title)}')" class="p-1.5 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors" title="重命名">
+                            <i class="fas fa-pen text-xs"></i>
+                        </button>
+                         <button onclick="deleteChat('${chat.id}', event)" class="p-1.5 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors" title="删除">
+                            <i class="far fa-trash-alt text-xs"></i>
+                        </button>
+                    </div>
                 `;
                 list.appendChild(div);
             });
@@ -571,6 +601,63 @@
             updateSendButtonState();
         }
 
+        // --- 新增：格式化消息内容，处理 <think> 标签 ---
+        function formatMessageContent(content) {
+            // 正则匹配 <think>...</think> 块
+            // [\s\S]*? 表示匹配任意字符包括换行符，非贪婪模式
+            const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+            
+            // 如果没有 think 标签，直接返回 Markdown 渲染结果
+            if (!thinkRegex.test(content)) {
+                return marked.parse(content);
+            }
+            
+            // 重置正则索引
+            thinkRegex.lastIndex = 0;
+            
+            let formattedHtml = '';
+            let lastIndex = 0;
+            let match;
+            
+            // 循环处理所有匹配到的 think 块 (虽然通常只有一个)
+            while ((match = thinkRegex.exec(content)) !== null) {
+                // 添加 think 块之前的普通文本
+                const before = content.substring(lastIndex, match.index);
+                if (before.trim()) {
+                    formattedHtml += marked.parse(before);
+                }
+                
+                // 处理 think 块内容
+                const thinkContent = match[1];
+                // 递归渲染内部 markdown (如果需要) 或仅处理换行
+                const thinkHtml = marked.parse(thinkContent);
+                
+                // 构建 Gemini 风格的折叠卡片
+                formattedHtml += `
+                    <details class="group mb-4 rounded-xl bg-[#f0f4f9] border-none overflow-hidden">
+                        <summary class="flex items-center gap-2 px-4 py-3 cursor-pointer select-none text-sm font-medium text-gray-600 hover:bg-[#e9eef6] transition-colors">
+                            <i class="fas fa-brain text-[#1a73e8]"></i>
+                            <span>思考过程</span>
+                            <i class="fas fa-chevron-down ml-auto text-xs text-gray-500 transition-transform duration-200 group-open:rotate-180"></i>
+                        </summary>
+                        <div class="px-4 py-3 text-sm text-gray-600 bg-[#f0f4f9] border-t border-gray-200/50 prose prose-sm max-w-none prose-p:my-1">
+                            ${thinkHtml}
+                        </div>
+                    </details>
+                `;
+                
+                lastIndex = thinkRegex.lastIndex;
+            }
+            
+            // 添加最后一个 think 块之后的文本
+            const after = content.substring(lastIndex);
+            if (after.trim()) {
+                formattedHtml += marked.parse(after);
+            }
+            
+            return formattedHtml;
+        }
+
         // 更新消息渲染样式
         function renderMessage(msg) {
             const messagesDiv = document.getElementById('messages');
@@ -586,13 +673,13 @@
                     </div>
                 `;
             } else {
-                // Assistant 消息：左侧添加图标，移除气泡背景
+                // Assistant 消息：使用新的 formatMessageContent 处理 <think> 标签
                 container.innerHTML = `
                     <div class="assistant-icon pt-1">
                          <i class="fas fa-sparkles sparkle-icon"></i>
                     </div>
                     <div class="message assistant prose prose-slate max-w-none">
-                        ${marked.parse(msg.content)}
+                        ${formatMessageContent(msg.content)}
                     </div>
                 `;
             }
