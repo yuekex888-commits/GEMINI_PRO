@@ -92,7 +92,7 @@
             left: 0;
             right: 0;
             background: transparent;
-            padding: 10px 16px;
+            padding: 10px 10px;
             padding-bottom: max(10px, var(--safe-bottom));
             z-index: 50;
             pointer-events: none;
@@ -107,10 +107,24 @@
             pointer-events: auto;
             border: 1px solid #e5e7eb;
             transition: box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: end; /* 底部对齐 */
         }
         .input-capsule:focus-within {
              border-color: var(--gemini-blue);
              box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+        }
+
+        /* 按住说话按钮样式 */
+        #voice-hold-btn {
+            touch-action: none; /* 禁止触摸滚动 */
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.1s;
+        }
+        #voice-hold-btn:active, #voice-hold-btn.active {
+            background-color: #d1d5db; /* gray-300 */
+            color: #374151;
         }
 
         /* 消息气泡 */
@@ -183,12 +197,12 @@
             align-items: center;
             justify-content: center;
             position: fixed;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 150px;
-            height: 150px;
-            background-color: rgba(0, 0, 0, 0.7);
+            width: 160px;
+            height: 160px;
+            background-color: rgba(0, 0, 0, 0.75);
             border-radius: 20px;
             z-index: 100;
             color: white;
@@ -199,12 +213,16 @@
         #recording-overlay.active {
             opacity: 1;
         }
+        .recording-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
         .recording-wave {
             display: flex;
             gap: 4px;
-            height: 30px;
+            height: 20px;
             align-items: center;
-            margin-bottom: 15px;
         }
         .recording-wave div {
             width: 4px;
@@ -218,15 +236,8 @@
         .recording-wave div:nth-child(5) { animation-delay: 0.4s; }
 
         @keyframes wave {
-            0%, 100% { height: 10px; }
-            50% { height: 30px; }
-        }
-
-        /* 按钮按下效果 */
-        #voice-btn:active {
-            background-color: #e5e7eb;
-            color: var(--gemini-blue);
-            transform: scale(0.95);
+            0%, 100% { height: 8px; }
+            50% { height: 24px; }
         }
 
         /* 设置弹窗动画 */
@@ -243,12 +254,13 @@
     <!-- 侧边栏遮罩 -->
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden transition-opacity backdrop-blur-sm" onclick="toggleSidebar()"></div>
 
-    <!-- 录音状态浮层 (微信风格) -->
+    <!-- 录音状态浮层 -->
     <div id="recording-overlay">
-        <div class="recording-wave">
+        <i class="fas fa-microphone recording-icon"></i>
+        <div class="recording-wave mb-2">
             <div></div><div></div><div></div><div></div><div></div>
         </div>
-        <p class="text-sm font-medium">正在说话...</p>
+        <p class="text-sm font-medium tracking-wide">正在说话...</p>
     </div>
 
     <!-- 侧边栏 (历史记录) -->
@@ -259,7 +271,7 @@
         
         <!-- 列表区域 -->
         <div id="chat-list" class="flex-1 overflow-y-auto p-3 space-y-2">
-            <!-- 列表由 JS 生成，首项将是新建对话 -->
+            <!-- 列表由 JS 生成 -->
         </div>
 
         <!-- 底部设置按钮区域 -->
@@ -315,13 +327,11 @@
                 <i class="fas fa-bars text-xl"></i>
             </button>
             
-            <!-- 标题 (点击重命名) -->
             <div class="flex-1 mx-2 overflow-hidden flex justify-center cursor-pointer hover:bg-gray-50 py-2 rounded-lg transition-colors group" onclick="renameCurrentChat()" title="点击重命名">
                  <h1 class="font-medium text-lg truncate text-gray-700 max-w-[200px]" id="current-chat-title">新对话</h1>
                  <i class="fas fa-pen text-xs text-gray-400 ml-2 mt-1.5 opacity-0 group-hover:opacity-100"></i>
             </div>
             
-            <!-- 设置按钮 -->
             <button onclick="openSettings()" class="p-3 -mr-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors active:scale-95">
                 <i class="fas fa-cog"></i>
             </button>
@@ -338,38 +348,46 @@
             </div>
         </div>
 
-        <!-- 底部输入栏 -->
+        <!-- 底部输入栏 (微信风格) -->
         <div id="input-area">
             <!-- 图片预览区域 -->
-            <div id="image-preview-container" class="hidden mb-3 relative inline-block ml-4">
+            <div id="image-preview-container" class="hidden mb-3 relative inline-block ml-10">
                 <img id="image-preview" src="" class="h-20 w-20 object-cover rounded-xl border border-gray-200 shadow-sm">
                 <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-gray-800 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-gray-900 active:scale-90 transition-transform">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="input-capsule flex items-end gap-1 mx-2 sm:mx-auto sm:max-w-3xl bg-white">
-                <!-- 图片上传按钮 -->
-                <button onclick="document.getElementById('image-upload').click()" class="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors shrink-0 active:scale-95">
+            <div class="input-capsule mx-1 sm:mx-auto sm:max-w-3xl bg-white relative">
+                <!-- 1. 语音/键盘 切换按钮 (最左侧) -->
+                <button id="mode-toggle-btn" onclick="toggleInputMode()" class="p-3 text-gray-500 hover:text-blue-600 transition-colors shrink-0 active:scale-95">
+                    <i class="fas fa-microphone text-xl" id="mode-icon"></i>
+                </button>
+
+                <!-- 2. 中间区域：文字输入框 或 按住说话按钮 -->
+                <div class="flex-1 relative mx-1 self-center" style="min-height: 44px; display: flex; align-items: center;">
+                    <!-- 文字输入框 -->
+                    <textarea id="user-input" rows="1" class="w-full bg-transparent border-0 focus:ring-0 px-2 py-2 text-base resize-none max-h-32 text-gray-700 placeholder-gray-400" placeholder="输入消息..." oninput="autoResize(this)"></textarea>
+                    
+                    <!-- 按住说话按钮 (默认隐藏) -->
+                    <button id="voice-hold-btn" 
+                        class="hidden w-full h-10 bg-gray-100 rounded-lg text-gray-700 font-bold tracking-wide active:bg-gray-200 transition-colors select-none items-center justify-center shadow-sm border border-gray-200"
+                        ontouchstart="handleVoiceStart(event)" 
+                        ontouchend="handleVoiceEnd(event)" 
+                        onmousedown="handleVoiceStart(event)" 
+                        onmouseup="handleVoiceEnd(event)"
+                        oncontextmenu="return false;">
+                        按住 说话
+                    </button>
+                </div>
+
+                <!-- 3. 图片上传按钮 -->
+                <button onclick="document.getElementById('image-upload').click()" class="p-3 text-gray-400 hover:text-blue-600 transition-colors shrink-0 active:scale-95">
                     <i class="far fa-image text-xl"></i>
                 </button>
                 <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(this)">
 
-                <!-- 文本输入 -->
-                <textarea id="user-input" rows="1" class="flex-1 bg-transparent border-0 focus:ring-0 px-2 py-3 text-base resize-none max-h-32 text-gray-700 placeholder-gray-400" placeholder="输入消息..." oninput="autoResize(this)"></textarea>
-
-                <!-- 语音按钮 (微信式按住说话) -->
-                <!-- 使用 touchstart/touchend 适配手机，mousedown/mouseup 适配电脑 -->
-                <button id="voice-btn" 
-                    ontouchstart="handleVoiceStart(event)" 
-                    ontouchend="handleVoiceEnd(event)" 
-                    onmousedown="handleVoiceStart(event)" 
-                    onmouseup="handleVoiceEnd(event)" 
-                    class="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors shrink-0 rounded-full select-none -webkit-user-select-none">
-                    <i class="fas fa-microphone text-xl"></i>
-                </button>
-
-                <!-- 发送按钮 -->
+                <!-- 4. 发送按钮 -->
                 <button id="send-btn" onclick="sendMessage()" class="p-3 text-gray-300 rounded-full transition-all shrink-0 cursor-not-allowed flex items-center justify-center w-12 h-12" disabled>
                     <i class="fas fa-paper-plane text-xl" id="send-icon"></i>
                     <i class="fas fa-spinner fa-spin text-xl hidden" id="loading-icon"></i>
@@ -392,6 +410,7 @@
         let currentImageBase64 = null;
         let recognition = null;
         let isRecording = false;
+        let isVoiceMode = false; // 记录当前是语音模式还是文字模式
 
         // 获取当前 API 配置
         function getApiConfig() {
@@ -487,7 +506,33 @@
             }
         }
 
-        // --- 语音识别 (WeChat Style) ---
+        // --- 核心：输入模式切换与语音逻辑 ---
+        
+        function toggleInputMode() {
+            isVoiceMode = !isVoiceMode;
+            const modeIcon = document.getElementById('mode-icon');
+            const textArea = document.getElementById('user-input');
+            const voiceBtn = document.getElementById('voice-hold-btn');
+
+            if (isVoiceMode) {
+                // 切换到语音模式
+                modeIcon.classList.remove('fa-microphone');
+                modeIcon.classList.add('fa-keyboard');
+                textArea.classList.add('hidden');
+                voiceBtn.classList.remove('hidden');
+                voiceBtn.style.display = 'flex'; // 确保 flex 布局生效
+            } else {
+                // 切换到键盘模式
+                modeIcon.classList.remove('fa-keyboard');
+                modeIcon.classList.add('fa-microphone');
+                voiceBtn.classList.add('hidden');
+                voiceBtn.style.display = 'none';
+                textArea.classList.remove('hidden');
+                setTimeout(() => textArea.focus(), 50); // 稍微延迟聚焦
+            }
+        }
+
+        // --- 语音识别 (Web Speech API) ---
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -498,7 +543,7 @@
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 const input = document.getElementById('user-input');
-                // 追加文本
+                // 将语音追加到输入框
                 input.value += (input.value ? ' ' : '') + transcript;
                 autoResize(input);
                 updateSendButtonState();
@@ -506,35 +551,50 @@
 
             recognition.onerror = (event) => {
                 console.error('语音识别错误:', event.error);
-                document.getElementById('recording-overlay').classList.remove('active');
+                endRecordingUI();
             };
 
             recognition.onend = () => {
-                document.getElementById('recording-overlay').classList.remove('active');
-                isRecording = false;
+                endRecordingUI();
             };
         } else {
-            document.getElementById('voice-btn').style.display = 'none';
+            // 不支持语音则隐藏切换按钮
+            document.getElementById('mode-toggle-btn').style.display = 'none';
         }
 
         function handleVoiceStart(e) {
-            e.preventDefault(); // 防止触发其他点击事件或滚动
+            // 防止重复触发和默认行为（如选中文本）
+            if (e.type === 'touchstart') e.preventDefault();
+            if (e.button !== 0 && e.type === 'mousedown') return; // 仅左键
+
             if (recognition && !isRecording) {
                 try {
                     recognition.start();
                     isRecording = true;
+                    // UI 反馈
                     document.getElementById('recording-overlay').classList.add('active');
+                    document.getElementById('voice-hold-btn').classList.add('active');
+                    document.getElementById('voice-hold-btn').innerText = '松开 结束';
                     if (navigator.vibrate) navigator.vibrate(50);
                 } catch (e) { console.error(e); }
             }
         }
 
         function handleVoiceEnd(e) {
-            e.preventDefault();
+            if (e.type === 'touchend') e.preventDefault();
+            
             if (recognition && isRecording) {
                 recognition.stop();
-                // Overlay 的移除由 onend 处理
+                // UI 恢复在 onend 中处理，确保逻辑闭环
             }
+        }
+        
+        function endRecordingUI() {
+            isRecording = false;
+            document.getElementById('recording-overlay').classList.remove('active');
+            const btn = document.getElementById('voice-hold-btn');
+            btn.classList.remove('active');
+            btn.innerText = '按住 说话';
         }
 
         // --- 聊天核心逻辑 ---
